@@ -20,7 +20,6 @@ class Node:
 class LinkedList:
 	def __init__(self, head=None):
 		self.head = head
-		# self.tail = tail
 	
 	def __str__(self):
 		return self.traversal()
@@ -111,9 +110,10 @@ class LinkedList:
 	# 순회를 하며 찾는 데이터가 없는 경우는, .next가 None이 나오도록
 	# 데이터를 못 찾은 경우일 것이다.
 	# search(self, data) -> Node
-	def search(self, data:int) -> Node:
+	def search(self, data:int, before=False) -> Node|tuple[Node, Node]:
 		# 반환할 찾은 노드를 담을 변수 선언
-		result_node = None
+		result_node:Node = None
+		before_node:Node = None
 		# self.head가 비어있다면 데이터가 아예 없는 것이므로
 		# 조기종료한다.
 		if self.head is None: return None
@@ -129,28 +129,100 @@ class LinkedList:
 			# 조기종료
 			if current_node.data == data:
 				break
+
+			# + before 매개변수가 True라면 이전 노드의 정보를 같이 반환해야 하므로
+			# .next를 current에 담기 전에 current를 before_node에 담아준다.
+			if before is True:
+				before_node = current_node
+
 			# 찾는 데이터를 가지지 않았다면 .next 노드를 current에 담는다.
 			current_node = current_node.next
 
 		# 만약 current_node가 None이라면
-		if current_node is None: return None
+		if current_node is None and before is False:
+			return None
+		
+		if current_node is None and before is True:
+			return (None, None)
 
 		# 여기까지 왔다면 current_node의 data가 찾는 data라는 뜻이다.
 		# current_node를 반환하면 끝난다.
-		return current_node
+		return (before_node, current_node) if before is True else current_node
 
 	# 4. 삭제
 	# 특정 데이터를 가진 노드를 찾아서 삭제
-	# 
+	# search 메서드를 활용하여 조회한 데이터를 삭제할 것이다.
+	# delete(self, data:int) -> bool
+	def delete(self, data:int) -> bool:
+		# 문제가 생겨서 삭제하지 못하면 False로 바꿔서 반환한다.
+		# search 메서드를 이용하여 데이터를 조회
+		before, current = self.search(data=data, before=True)
 
+		# 조회한 노드가 None이라면 데이터를 찾지 못한 것이므로
+		# False를 반환한다.
+		if current is None: return False
+
+		# 여기까지 내려왔다면 node에 담긴 것은 실제 노드 객체일 것이다.
+		# 해당 노드를 삭제하려면 앞 노드의 next를 지우려는 node의 next로 바꿔줘야 한다.
+
+		# 삭제하려는 노드 앞에 위치한 노드 정보가 필요해졌다.
+		# why? 앞의 노드.next의 값을 삭제하려는 노드.next 객체 정보로 바꿔줘야 한다.
+
+		# 만약 current 노드가 head라면 before 노드가 없을 수 있다(None) -> 처리 필요
+		# print("before.data: ", before.data)
+		# print("current.data: ", current.data)
+		# 이때 head를 삭제하는 경우에는 self.head도 기존 head의 next로 바꿔주어야 한다.
+
+		# 지우려는 데이터가 self.head가 가진 데이터라면
+		# before 노드가 None이라면 self.head라고 볼 수 있다.
+		if before is None:
+			# self.head를 다음 노드로 저장
+			self.head = self.head.next
+			# 기존 head를 제거
+			del current
+			# 정상 제거 되었음을 반환
+			return True
+		
+		# 만약 지우려는 데이터를 헤드가 아닌 노드가 가지고 있다면
+		# next를 이전하는 작업을 해주어야 한다.
+		# 지우려는 노드의 next 노드를 이전 노드의 next에 저장한다.
+		before.next = current.next
+		# 지우려는 노드를 지운다.
+		del current
+		return True
 
 	# 5. 삽입
 	# 특정 노드와 그 노드 다음 노드 사이에 새로운 노드를 삽입하는 동작
 	# 특정 노드를 입력받아 동작한다.
+	# search() 메서드의 before 변수를 활용하여 삽입하고자 하는 노드의 데이터를 기준으로
+	# current 노드를 찾아서 before 노드와 current 노드 사이에 새로운 노드를 삽입한다.
+	# insert(self, data:int, after_data:int)
+	def insert(self, new_data:int, after_data:int):
+		# search로 after_data를 가진 노드를 찾아서
+		# after의 before 노드와 after 사이에 새로운 노드를 삽입한다.
+		new_node = Node(new_data)
+		# search로 before, after 노드를 찾는다.
+		before, after = self.search(after_data, True)
 
+		# 만약 before가 None이라면, after가 None인지도 검사해야 한다.
+		# 이는 찾는 데이터가 없다는 의미이므로 None을 반환한다.
+		if before is None and after is None: return None
+		
+		# before는 None인데 after는 None이 아니라면
+		# after가 head라는 의미이므로
+		if before is None and after is not None:
+			new_node.next = after # 이 경우 after는 기존 head와 같은 객체다.
+			self.head = new_node # head를 바꿔준다.
+			return True # 정상 종료
 
+		# new 노드의 next에 after 노드를 저장한다.
+		new_node.next = after
 
+		# before 노드의 next에 new 노드를 저장한다.
+		before.next = new_node
 
+		# 정상 종료
+		return True
 
 if __name__ == "__main__":
 	# 연결 리스트 객체 생성
@@ -170,3 +242,14 @@ if __name__ == "__main__":
 	print(link)
 
 	print(link.search(10).next.data)
+
+	link.delete(13)
+	print(link) # 3 -> 10 -> 11 -> 12 -> 13 -> 14
+
+	# link.insert(23, 12) # 중간에 삽입
+	# print(link) # 3 -> 10 -> 11 -> 23 -> 12 -> 13 -> 14 
+	link.insert(23, link.head.data) # head 앞에 추가
+	print(link) # 23 -> 3 -> 10 -> 11 -> 12 -> 13 -> 14 
+
+	link.insert(333, link.head.data) # head 앞에 추가
+	print(link) # 333 -> 23 -> 3 -> 10 -> 11 -> 12 -> 13 -> 14 
