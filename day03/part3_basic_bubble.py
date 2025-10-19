@@ -66,7 +66,10 @@ def bubble_sort2(datas:list):
 	swapped = False # 각 패스마다 초기화하고, 교환이 이루어진 경우
 	# True로 바꾼다.
 	# 각 패스가 끝났을 때 이 변수의 값을 확인하여 조기종료 여부를 결정한다.
+	count = 0
 	for i in range(n):
+		print(f"{i+1}/{n}")
+		count += 1
 		# 한 path가 종료될 때마다 마지막 요소로부터 i개 요소는
 		# 정렬된 것으로 취급한다.
 		# 때문에 내부for문에서 마지막 i개 요소는 확인하지 않는다.
@@ -75,11 +78,13 @@ def bubble_sort2(datas:list):
 				datas[j], datas[j+1] = datas[j+1], datas[j]
 				# 교환이 이루어졌으므로 swapped를 True로 바꿔준다.
 				swapped = True
+			
 		# 외부 for문에서 swapped를 검사하여
 		# 이번 패스에서 교환이 한번도 이루어지지 않았다면
 		# 모두 정렬된 것으로 취급하여 정렬을 조기종료한다.
 		if swapped is False:
 			break # 외부 for문 탈출
+	print(count)
 	return datas # 굳이 반환할 필요는 없지만 마무리해준다.
 
 if __name__ == "__main__":
@@ -94,7 +99,7 @@ if __name__ == "__main__":
 	# print(datas)
 	# 두 개 정렬에 사용되는 데이터가 같으면 실험이 안 되므로
 	# 복사를 통해서 각각 실행시간을 측정한다.
-	sort1_time = bubble_sort1(datas.copy())
+	# sort1_time = bubble_sort1(datas.copy())
 	sort2_time = bubble_sort2(datas.copy())
-	print(f"{sort1_time/sort2_time * 100:.2f}%")
+	# print(f"{sort1_time/sort2_time * 100:.2f}%")
 	# print(datas)
