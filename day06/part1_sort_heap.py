@@ -30,11 +30,34 @@ class MaxHeap2(MaxHeap):
     def extract_max(self):
         return super().extract_max()
     
-    def _heapify_up(self, index):
-        return super()._heapify_up(index)
+    def _heapify_up(self, index) -> None:
+        # 만약에 현재 인덱스(index)가 루트노드 인덱스라면
+        # 부모노드 인덱스가 없을 것이다.
+        if not MaxHeap2.has_parent(index):
+            # 부모노드가 없는 경우, 조기 종료
+            return
+        current_data = self.heap[index]
+        parent_index = MaxHeap2.parent(index)
+        parent_data = self.heap[parent_index]
+        if current_data > parent_data:
+            self.heap[index], self.heap[parent_index] = \
+                parent_data, current_data
+            self._heapify_up(parent_index)
+
+    def _heapify_down(self, index) -> None:
+        largest_index = index
+        left_index = MaxHeap2.left_child(index)
+        right_index = MaxHeap2.right_child(index)
+        if left_index < len(self.heap) and self.heap[left_index] > self.heap[largest_index]:
+            largest_index = left_index
+
+        if right_index < len(self.heap) and self.heap[right_index] > self.heap[largest_index]:
+            largest_index = right_index
     
-    def _heapify_down(self, index):
-        return super()._heapify_down(index)
+        if largest_index != index:
+            self.heap[index], self.heap[largest_index] =\
+                self.heap[largest_index], self.heap[index]
+            self._heapify_down(largest_index)
 
     # 부모노드의 인덱스를 반환하는 단순함수
     @staticmethod
@@ -67,11 +90,45 @@ class MaxHeap2(MaxHeap):
     def has_right_child(self, i):
         return MaxHeap2.right_child(i) < len(self.heap)
 
+    # 가장 큰 값(루트노드의 값)을 제거하지 않고 확인하는 메서드
+    def peek(self):
+        return self.heap[0] if self.heap else None
+    
+    # 힙에 저장된 요소의 개수(힙 크기) 반환
+    def size(self) -> int:
+        """힙 크기 반환"""
+        return len(self.heap)
+    
+    # 힙이 비어있는지 여부
+    def is_empty(self):
+        """힙이 비어있는지 확인"""
+        return len(self.heap) == 0 # 요소의 개수가 0개면 True 반환
+    
+    # 힙 구조 출력
+    def print_heap(self):
+        """힙 구조 출력"""
+        # print(f"MaxHeap2: {self.heap}")
+        print(self.__str__())
+        return 
+    
+    # 대표 문자열 반환
+    def __str__(self):
+        return f"MaxHeap2: {self.heap}"
 
 if __name__ == "__main__":
-    heap = MaxHeap()
+    heap = MaxHeap2()
     heap.insert(3)
     heap.insert(4)
     heap.insert(7)
-    print(heap.heap) # 7 3 4
-    pass
+    print(heap) # 7 3 4
+    heap.print_heap()
+
+    heap.insert(10)\
+        .insert(13)\
+        .insert(8)
+    
+    print(heap)
+    print(heap.peek())
+    print(heap)
+
+    

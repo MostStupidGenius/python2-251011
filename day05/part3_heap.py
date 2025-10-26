@@ -23,6 +23,10 @@ class MaxHeap:
         # 2. 추가된 값이 힙 속성을 만족하지 못하게 만들 수 있으므로
         # 힙속성을 유지하기 위한 heapify함수를 호출한다.
         self._heapify_up(len(self.heap) - 1)
+
+        # 체이닝 기법(chaining method)
+        # 반환값을 self로 하면 사용하는 쪽에서 연쇄적으로 메서드를 사용할 수 있다.
+        return self
     
     # 힙속성 만족을 위한 상향조정 함수
     # _heapify_up(self, index) -> None:
