@@ -91,6 +91,6 @@ if __name__ == "__main__":
         'C': ['A', 'D'],
         'D': ['C']
     }
-    target = 'D'
+    target = 'B'
     DFS_stack(graph, target)
     DFS_recursive(graph, target)
