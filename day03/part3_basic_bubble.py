@@ -15,7 +15,7 @@ def clock(func, *args):
 		# 실행 전 시각 추출
 		before = time.time()
 		# 함수 실행
-		func(args)
+		result = func(args)
 		# 함수 실행 후 시각 추출
 		after = time.time()
 		# 실행 후 시간에서 실행 전 시간을 빼면
@@ -24,7 +24,7 @@ def clock(func, *args):
 		# :.2f는 소숫점 아래 2자리까지만 표시
 
 		print(f"실행시간: {run_time}s")
-		return after - before # 측정된 시간 반환
+		return result, after - before # 측정된 시간 반환
 	return wrapper
 
 # 데코레이터 함수는 타겟 함수보다 먼저 정의되어야 한다.
